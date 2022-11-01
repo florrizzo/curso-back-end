@@ -6,13 +6,26 @@ class Contenedor {
         this.filePath = "./productos.txt";        
     }
 
-    async save(nombre, precio){
+    async save(nombre, precio, url){
         try {
             let highestid = Math.max(...productos.map((el) => el.id));
             let id = highestid + 1;
-            let productoNuevo = {"title": nombre, "price": precio, "id": id};
+            let productoNuevo = {"id": id, "title": nombre, "price": precio, "thumbnail": url};
             productos = productos.concat(productoNuevo);
-            console.log(`Se añadió el pokemon ${productoNuevo.title} a la lista`);
+            console.log(`Se añadió el producto ${productoNuevo.title} a la lista`);
+            await fs.promises.writeFile(this.filePath, JSON.stringify(productos));
+            return id;
+        } catch {
+            console.log('Se ha producido un error');
+        }
+    }
+
+    async replace(num, nombre, precio, url){
+        try {
+            const productoNuevo = {"id": num, "title": nombre, "price": precio, "thumbnail": url};
+            const indice = productos.map(object => object.id).indexOf(num);
+            productos[indice] = productoNuevo;
+            console.log(`Se añadió el producto ${productoNuevo.title} a la lista`);
             await fs.promises.writeFile(this.filePath, JSON.stringify(productos));
         } catch {
             console.log('Se ha producido un error');
@@ -23,7 +36,7 @@ class Contenedor {
         try{
             const index = productos.map(object => object.id).indexOf(number);
             if (productos[index]){
-                console.log(productos[index]);
+                return productos[index];
             } else {
                 console.log('No existe el número de id elegido');
             }            
@@ -33,7 +46,7 @@ class Contenedor {
     }
 
     getAll(){        
-        console.log(productos);        
+        return productos        
     }
 
     async deleteById(number){
@@ -41,7 +54,7 @@ class Contenedor {
             const index = productos.map(object => object.id).indexOf(number);
             productos.splice(index, 1);
             console.log(productos);
-            await fs.writeFile(this.filePath, JSON.stringify(productos));
+            await fs.promises.writeFile(this.filePath, JSON.stringify(productos));
         } catch {
             console.log('Se ha producido un error');
         }        
@@ -60,19 +73,13 @@ class Contenedor {
 
 const contenedor = new Contenedor();
 
-// contenedor.save("Bulbasaur", 300);
-// contenedor.getAll();
-// contenedor.getById(3);
-// contenedor.deleteById(2);
-// contenedor.deleteAll();
-
-
+module.exports = Contenedor;
 
 // productos.txt original:
 
 // [
-//   { "title": "Pikachu", "price": 100, "id": 1 },
-//   { "title": "Furret", "price": 200, "id": 2 },
-//   { "title": "Eevee", "price": 150, "id": 3 }
+//     { "id": 1, "title": "Red Velvet", "price": 2000, "thumbnail": "https://www.elmundoeats.com/wp-content/uploads/2018/05/Red-Velvet-Cake-1.jpg" },
+//     { "id": 2, "title": "Budín de limon", "price": 1000, "thumbnail": "https://www.cucinare.tv/wp-content/uploads/2020/01/Dise%C3%B1o-sin-t%C3%ADtulo-32.png"},
+//     { "id": 3, "title": "Brownie", "price": 1500, "thumbnail": "https://img2.rtve.es/imagenes/aqui-tierra-receta-brownie-jesus-monedero/1585576217689.JPG"}
 // ]
 
